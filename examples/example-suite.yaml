@@ -1,52 +1,93 @@
-# Example Test Suite
+# Template Test Suite
 #
-# This is an example test suite demonstrating the YAML format.
-# Copy and modify this for your own agent testing needs.
+# This is a template test suite demonstrating the YAML format.
+# Copy this file and customize it for your own agent testing needs.
+#
+# Usage:
+#   1. Copy this file to a new name (e.g., my-agent-tests.yaml)
+#   2. Update agent_dir to point to your agent's working directory
+#   3. Adjust max_turns, allowed_tools, and permission_mode as needed
+#   4. Replace the example tests with your own test cases
+#
+# See pm-assistant-airtable.yaml for a real-world example.
 
-name: "example-agent-tests"
-description: "Example test suite demonstrating the agent test harness"
+name: "template-agent-tests"
+description: "Template test suite - copy and customize for your agent"
 
-# The directory where the agent will run (must exist)
-agent_dir: "/tmp/test-agent-workspace"
+# REQUIRED: The directory where the agent will run
+# This should be an existing directory containing your agent's CLAUDE.md
+# and any files/skills it needs to access.
+agent_dir: "/path/to/your/agent/workspace"
 
-# Maximum turns allowed per test (default: 10)
+# Maximum conversation turns allowed per test (default: 10)
+# Lower values run faster but may not complete complex tasks.
+# Higher values allow more thorough exploration but cost more.
 max_turns: 5
 
 # Comma-separated list of allowed tools
+# Common tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
+# Restrict to only what your tests need for faster, more focused testing.
 allowed_tools: "Bash,Read,Glob,Grep,Write"
 
-# Permission mode: default, acceptEdits, or bypassPermissions
+# Permission mode controls how the harness handles tool approval:
+#   - "default": Prompt for each tool use (interactive)
+#   - "acceptEdits": Auto-approve file edits (recommended for testing)
+#   - "bypassPermissions": Skip all permission checks (use with caution)
 permission_mode: "acceptEdits"
 
 tests:
-  # Basic file system test
-  - id: "list-directory"
+  # ============================================================================
+  # Test Structure
+  # ============================================================================
+  # Each test requires:
+  #   - id: Unique identifier (use-hyphens-not-underscores)
+  #   - prompt: The question or task given to the agent
+  #   - expected_behavior: Description of correct behavior (for evaluation)
+  #
+  # Optional:
+  #   - tags: Array of strings for filtering/categorization
+  #   - max_turns: Override suite-level max_turns for this test
+  # ============================================================================
+
+  # Example 1: Basic capability test
+  - id: "basic-file-listing"
     prompt: "List all files in the current directory"
-    expected_behavior: "Agent should use ls or Glob to list files"
-    tags:
-      - filesystem
-      - basic
+    expected_behavior: |
+      Agent should use Glob or Bash (ls) to list files.
+      Should return a clear list of filenames.
+    tags: ["filesystem", "basic"]
 
-  # Search test
-  - id: "find-python-files"
+  # Example 2: Search/discovery test
+  - id: "find-specific-files"
     prompt: "Find all Python files in this directory and its subdirectories"
-    expected_behavior: "Agent should use Glob with **/*.py pattern"
-    tags:
-      - search
-      - glob
+    expected_behavior: |
+      Agent should use Glob with **/*.py pattern.
+      Should return full paths to all matching files.
+    tags: ["search", "glob"]
 
-  # Content analysis test
-  - id: "count-lines"
-    prompt: "Count the total number of lines across all text files"
-    expected_behavior: "Agent should combine Glob and Bash (wc -l)"
-    tags:
-      - analysis
-      - bash
+  # Example 3: Analysis test (requires reading content)
+  - id: "analyze-code-structure"
+    prompt: "What functions are defined in the main module?"
+    expected_behavior: |
+      Agent should identify the main module file.
+      Should read the file and extract function definitions.
+      Should return function names with brief descriptions.
+    tags: ["analysis", "code-reading"]
 
-  # Error handling test
+  # Example 4: Error handling test
   - id: "handle-missing-file"
     prompt: "Read the contents of /nonexistent/file.txt and summarize it"
-    expected_behavior: "Agent should gracefully handle the missing file error"
-    tags:
-      - error-handling
-      - edge-case
+    expected_behavior: |
+      Agent should attempt to read the file.
+      Should gracefully handle the missing file error.
+      Should inform the user that the file does not exist.
+    tags: ["error-handling", "edge-case"]
+
+  # Example 5: Multi-step workflow test
+  - id: "complex-workflow"
+    prompt: "Find all TODO comments in the codebase and summarize them"
+    expected_behavior: |
+      Agent should use Grep to search for TODO patterns.
+      Should collect results from multiple files.
+      Should provide a summary organized by file or priority.
+    tags: ["multi-step", "search", "analysis"]

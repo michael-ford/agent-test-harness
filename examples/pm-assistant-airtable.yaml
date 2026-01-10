@@ -1,0 +1,102 @@
+# Test suite for PM Assistant's Airtable Snapshot Navigator skill
+# Tests 10 common PM query workflows
+
+name: "pm-assistant-airtable"
+description: "Tests for the Airtable snapshot navigator skill. Validates that Claude can efficiently query project management data using the snapshot files."
+agent_dir: "/Users/mikeford/ola-agents/pm-assistant"
+max_turns: 10
+allowed_tools: "Bash,Read,Glob,Grep"
+permission_mode: "acceptEdits"
+
+tests:
+  # Query 1: Personal task lookup by email
+  - id: "query-my-tasks"
+    prompt: "What tasks are assigned to michael@olastrategy.com?"
+    expected_behavior: |
+      Should query Task records and filter by Owner.email field.
+      Use the Airtable snapshot navigator skill to locate the correct data files.
+      Return task names, status, due dates, and priorities.
+    tags: ["owner-query", "email-lookup", "basic"]
+
+  # Query 2: Overdue task identification
+  - id: "query-overdue-tasks"
+    prompt: "What tasks are overdue?"
+    expected_behavior: |
+      Should compare Due Date field with current date.
+      Filter for tasks where Status is not Completed or Cancelled.
+      Return overdue task names, due dates, and owners.
+    tags: ["date-filter", "status-filter", "overdue"]
+
+  # Query 3: Upcoming deadlines
+  - id: "query-due-this-week"
+    prompt: "What tasks are due in the next 7 days?"
+    expected_behavior: |
+      Should calculate date range (today to today+7).
+      Filter tasks by Due Date within range.
+      Exclude completed tasks.
+      Return sorted by due date.
+    tags: ["date-filter", "date-range", "upcoming"]
+
+  # Query 4: Project status overview
+  - id: "query-project-status"
+    prompt: "What is the status of the Long Beach Airport project?"
+    expected_behavior: |
+      Should search Projects by name (case-insensitive).
+      Return project details including status, start/end dates.
+      Optionally include linked milestones and their status.
+    tags: ["project-lookup", "cross-reference"]
+
+  # Query 5: Project team lookup
+  - id: "query-project-team"
+    prompt: "Who is working on the Long Beach Airport project?"
+    expected_behavior: |
+      Should find project by name.
+      Extract Team Members, Project Lead, and Client Contact fields.
+      Resolve People record IDs to names if needed.
+    tags: ["project-lookup", "team-query", "cross-reference"]
+
+  # Query 6: At-risk milestones
+  - id: "query-milestones-at-risk"
+    prompt: "What milestones are at risk or blocked?"
+    expected_behavior: |
+      Should query Phases_Containers_Milestones table.
+      Filter by Health field ('At Risk') or Status field containing 'Blocked'.
+      Return milestone names, status, due dates, and any task counts.
+    tags: ["milestone-query", "health-filter", "risk"]
+
+  # Query 7: In-progress work
+  - id: "query-tasks-in-progress"
+    prompt: "What tasks are currently in progress?"
+    expected_behavior: |
+      Should filter Task records by Status = 'In Progress'.
+      Return task names, owners, due dates.
+      Optionally resolve milestone references to names.
+    tags: ["status-filter", "basic"]
+
+  # Query 8: Active projects list
+  - id: "query-active-projects"
+    prompt: "What active projects do we have?"
+    expected_behavior: |
+      Should filter Projects by Status = 'Active'.
+      Return project names, start/end dates, leads, priorities.
+      Optionally show project count or status distribution.
+    tags: ["project-query", "status-filter", "basic"]
+
+  # Query 9: Person's tasks across projects
+  - id: "query-person-tasks"
+    prompt: "What tasks does Connor have across all projects?"
+    expected_behavior: |
+      Should search Task records by Owner.name containing 'Connor' (case-insensitive).
+      Return all matching tasks with names, status, due dates, and priorities.
+      Optionally group by project or milestone.
+    tags: ["owner-query", "name-lookup", "cross-project"]
+
+  # Query 10: Upcoming milestones
+  - id: "query-upcoming-milestones"
+    prompt: "What milestones are coming up in the next 30 days?"
+    expected_behavior: |
+      Should calculate date range (today to today+30).
+      Filter milestones by Target Due Date within range.
+      Exclude completed milestones.
+      Return sorted by due date with owner and task completion info.
+    tags: ["milestone-query", "date-range", "upcoming"]
