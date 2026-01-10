@@ -16,10 +16,24 @@ Test Claude Code agents with automated multi-turn execution and structured feedb
 
 ## Quick Start
 
-1. Create a test suite YAML file
-2. Run tests: `python scripts/run_test_suite.py path/to/suite.yaml`
-3. Review results in `.agent-test-results/{suite-name}/{timestamp}/`
-4. Use `@test-aggregator` to analyze results and prioritize improvements
+1. Create a test suite YAML file (see format below)
+2. Ensure dependencies are installed:
+   ```bash
+   pip install -r ${CLAUDE_PLUGIN_ROOT}/scripts/requirements.txt
+   ```
+3. Validate the suite with dry-run:
+   ```bash
+   python ${CLAUDE_PLUGIN_ROOT}/scripts/run_test_suite.py path/to/suite.yaml --dry-run
+   ```
+4. Run the tests:
+   ```bash
+   python ${CLAUDE_PLUGIN_ROOT}/scripts/run_test_suite.py path/to/suite.yaml
+   ```
+   The script will prompt for:
+   - Timeout preference (5 min, 10 min, or no timeout per test)
+   - Cost confirmation before starting
+5. Review results in `.agent-test-results/{suite-name}/{timestamp}/`
+6. Use `@test-aggregator` to analyze results and prioritize improvements
 
 ## Test Suite Format
 
@@ -91,13 +105,19 @@ Human-readable summary with statistics and all suggestions.
 ### Run a test suite
 
 ```bash
-python scripts/run_test_suite.py path/to/suite.yaml
+python ${CLAUDE_PLUGIN_ROOT}/scripts/run_test_suite.py path/to/suite.yaml
 ```
 
 ### Dry run (validate without executing)
 
 ```bash
-python scripts/run_test_suite.py path/to/suite.yaml --dry-run
+python ${CLAUDE_PLUGIN_ROOT}/scripts/run_test_suite.py path/to/suite.yaml --dry-run
+```
+
+### Re-run aggregation on existing results
+
+```bash
+python ${CLAUDE_PLUGIN_ROOT}/scripts/aggregate_results.py .agent-test-results/{suite}/{timestamp}/
 ```
 
 ## Analyzing Results

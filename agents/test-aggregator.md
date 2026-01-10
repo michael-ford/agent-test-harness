@@ -10,7 +10,7 @@ You are a specialized agent for analyzing Claude Code agent test results and syn
 
 ## When to Use This Agent
 
-Use this agent after running a test suite with `/run-test-suite` or `python scripts/run_test_suite.py`. The agent analyzes the collected results and provides actionable insights for improving the tested agent.
+Use this agent after running a test suite with `python scripts/run_test_suite.py`. The agent analyzes the collected results and provides actionable insights for improving the tested agent.
 
 ## Input
 

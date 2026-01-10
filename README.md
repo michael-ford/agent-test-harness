@@ -33,9 +33,7 @@ pip install -r scripts/requirements.txt
 
 ### Running Tests
 
-> **Note:** The `/run-test-suite` slash command will be available in a future release. For now, use the Python script directly.
-
-Use the `/run-test-suite` command or run the Python script directly:
+Run tests using the Python script:
 
 ```bash
 # Normal run
