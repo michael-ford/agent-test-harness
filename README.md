@@ -157,6 +157,25 @@ Before running tests, the harness estimates the total cost based on:
 
 You'll be asked to confirm before proceeding.
 
+## Development
+
+### Updating the Plugin
+
+The Claude Code plugin system uses version numbers to detect updates. **Code changes won't be picked up without a version bump.**
+
+After making changes:
+1. Bump the version in `.claude-plugin/plugin.json`
+2. Commit and push
+3. Update the marketplace cache: `claude plugin marketplace update agent-test-harness`
+4. Update the plugin: `claude plugin update agent-test-harness@agent-test-harness --scope local`
+5. Restart Claude Code
+
+If you forget to bump the version, you'll need to uninstall/reinstall:
+```bash
+claude plugin uninstall agent-test-harness@agent-test-harness --scope local
+claude plugin install agent-test-harness@agent-test-harness --scope local
+```
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.

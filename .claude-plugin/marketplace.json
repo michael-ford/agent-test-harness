@@ -10,7 +10,7 @@
     {
       "name": "agent-test-harness",
       "description": "Testing infrastructure for Claude Code agents with multi-turn reflection and LLM-synthesized improvement suggestions",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Mike Ford",
         "email": "michael@olastrategy.com"
