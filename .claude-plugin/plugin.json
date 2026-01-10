@@ -7,7 +7,5 @@
     "email": "michael@olastrategy.com"
   },
   "license": "MIT",
-  "keywords": ["testing", "agents", "automation", "quality-assurance", "reflection", "claude-code"],
-  "agents": ["../agents"],
-  "skills": ["../skills"]
+  "keywords": ["testing", "agents", "automation", "quality-assurance", "reflection", "claude-code"]
 }
