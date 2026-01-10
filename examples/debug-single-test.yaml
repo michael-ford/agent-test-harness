@@ -1,0 +1,16 @@
+# Single test for debugging the harness
+name: "debug-single-test"
+description: "Single test to debug the harness"
+agent_dir: "/Users/mikeford/ola-agents/pm-assistant"
+max_turns: 10
+allowed_tools: "Bash,Read,Glob,Grep"
+permission_mode: "acceptEdits"
+
+tests:
+  - id: "query-my-tasks"
+    prompt: "What tasks are assigned to michael@olastrategy.com?"
+    expected_behavior: |
+      Should query Task records and filter by Owner.email field.
+      Use the Airtable snapshot navigator skill to locate the correct data files.
+      Return task names, status, due dates, and priorities.
+    tags: ["owner-query", "email-lookup", "basic"]

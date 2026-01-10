@@ -1,0 +1,113 @@
+# Full test suite for PM Assistant
+# 5 complex examples + 5 custom prompts based on actual data
+
+name: "pm-assistant-full-test"
+description: "Comprehensive test of Airtable snapshot navigator skill with complex queries"
+agent_dir: "/Users/mikeford/ola-agents/pm-assistant"
+max_turns: 10
+allowed_tools: "Bash,Read,Glob,Grep"
+permission_mode: "acceptEdits"
+
+tests:
+  # =========================================================================
+  # Complex Example Prompts (from original suite)
+  # =========================================================================
+
+  # Cross-reference query
+  - id: "query-project-team"
+    prompt: "Who is working on the Long Beach Airport project?"
+    expected_behavior: |
+      Should find project by name.
+      Extract Team Members, Project Lead, and Client Contact fields.
+      Resolve People record IDs to names if needed.
+    tags: ["project-lookup", "team-query", "cross-reference"]
+
+  # Risk/health filter
+  - id: "query-milestones-at-risk"
+    prompt: "What milestones are at risk or blocked?"
+    expected_behavior: |
+      Should query milestones_with_context view.
+      Filter by Health field ('At Risk') or check for blocked/overdue task counts.
+      Return milestone names, status, due dates, and task counts.
+    tags: ["milestone-query", "health-filter", "risk"]
+
+  # Cross-project person query
+  - id: "query-person-tasks"
+    prompt: "What tasks does Connor have across all projects?"
+    expected_behavior: |
+      Should search Task records by Owner.name containing 'Connor' (case-insensitive).
+      Return all matching tasks with names, status, due dates, and priorities.
+      Optionally group by project or milestone.
+    tags: ["owner-query", "name-lookup", "cross-project"]
+
+  # Date filter
+  - id: "query-overdue-tasks"
+    prompt: "What tasks are overdue?"
+    expected_behavior: |
+      Should compare Due Date field with current date.
+      Filter for tasks where Status is not Completed or Cancelled.
+      Return overdue task names, due dates, and owners.
+    tags: ["date-filter", "status-filter", "overdue"]
+
+  # Date range with milestone context
+  - id: "query-upcoming-milestones"
+    prompt: "What milestones are coming up in the next 30 days?"
+    expected_behavior: |
+      Should calculate date range (today to today+30).
+      Filter milestones by Target Due Date within range.
+      Exclude completed milestones.
+      Return sorted by due date with owner and task completion info.
+    tags: ["milestone-query", "date-range", "upcoming"]
+
+  # =========================================================================
+  # Custom Prompts (based on actual data exploration)
+  # =========================================================================
+
+  # Leah May has 56 tasks - highest volume
+  - id: "leah-workload-summary"
+    prompt: "Give me a summary of Leah May's current workload - how many tasks does she have, what's their status breakdown, and which projects is she working on?"
+    expected_behavior: |
+      Should query tasks by owner name 'leah may' (case-insensitive).
+      Count tasks by status (In Progress, To Do, Backlog, Completed, etc).
+      Group by project to show distribution.
+      Highlight any overdue items.
+    tags: ["owner-query", "workload", "summary", "custom"]
+
+  # Long Beach Airport Phase 1 has 7 overdue tasks
+  - id: "lba-phase1-status"
+    prompt: "What's the status of Phase 1 for the Long Beach Airport project? How many tasks are overdue?"
+    expected_behavior: |
+      Should find the milestone 'Phase 1: Project Foundation and Relationship Building'.
+      Show task counts (total, completed, in progress, overdue).
+      List specific overdue tasks if possible.
+    tags: ["milestone-query", "project-specific", "overdue", "custom"]
+
+  # Songheese Proposal is a short timeline urgent project
+  - id: "songheese-project-overview"
+    prompt: "Give me an overview of the Songheese Proposal project - what's the timeline, who's involved, and what needs to be done?"
+    expected_behavior: |
+      Should query project details from milestones_with_context.
+      Show project dates, team members, owners.
+      List milestones and their status.
+      Highlight urgent items or blockers.
+    tags: ["project-overview", "timeline", "team", "custom"]
+
+  # HFN Strategic Planning has mixed completion status
+  - id: "hfn-strategic-completion"
+    prompt: "How close is the HFN Strategic Planning project to completion? What's left to do?"
+    expected_behavior: |
+      Should find 'Huu-ay-aht First Nation Strategic Planning Session Facilitation'.
+      Calculate completion percentage from task counts.
+      List remaining in-progress and to-do tasks.
+      Identify any blockers or overdue items.
+    tags: ["project-progress", "completion", "remaining-work", "custom"]
+
+  # Cross-project comparison
+  - id: "all-projects-health-comparison"
+    prompt: "Compare the health of all active projects - which ones have the most overdue tasks or issues?"
+    expected_behavior: |
+      Should aggregate task counts across all projects.
+      Calculate overdue percentage or count for each.
+      Rank projects by health/risk.
+      Provide summary recommendations.
+    tags: ["cross-project", "comparison", "health", "summary", "custom"]
