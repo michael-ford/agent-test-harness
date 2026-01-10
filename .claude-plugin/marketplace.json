@@ -15,7 +15,7 @@
         "name": "Mike Ford",
         "email": "michael@olastrategy.com"
       },
-      "source": ".",
+      "source": "./",
       "category": "development"
     }
   ]
