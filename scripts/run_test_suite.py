@@ -440,6 +440,10 @@ def run_test_suite(suite: dict, timeout: Optional[int], results_dir: Path) -> li
 def aggregate_results(results: list[dict], results_dir: Path) -> dict:
     """
     Aggregate test results and extract improvement suggestions.
+
+    This function provides inline aggregation for immediate feedback,
+    then calls the standalone aggregate_results.py script to generate
+    the full aggregate-summary.json and aggregate-report.md files.
     """
     aggregation = {
         "schema_version": SCHEMA_VERSION,
@@ -494,12 +498,31 @@ def aggregate_results(results: list[dict], results_dir: Path) -> dict:
                 # Reflection wasn't valid JSON, store raw
                 pass
 
-    # Write aggregation
+    # Write legacy aggregation file (for backwards compatibility)
     agg_path = results_dir / "_aggregation.json"
     with open(agg_path, 'w') as f:
         json.dump(aggregation, f, indent=2)
 
-    print(f"\nAggregation saved to: {agg_path}")
+    # Also run the standalone aggregation script for full output
+    # This generates aggregate-summary.json and aggregate-report.md
+    script_dir = Path(__file__).parent
+    agg_script = script_dir / "aggregate_results.py"
+
+    if agg_script.exists():
+        try:
+            result = subprocess.run(
+                [sys.executable, str(agg_script), str(results_dir)],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                print(f"\nWarning: Aggregation script failed: {result.stderr}",
+                      file=sys.stderr)
+        except Exception as e:
+            print(f"\nWarning: Could not run aggregation script: {e}",
+                  file=sys.stderr)
+    else:
+        print(f"\nNote: Standalone aggregation script not found at {agg_script}")
 
     # Print summary of improvements
     if aggregation["improvement_suggestions"]:
