@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agent-test-harness",
+  "description": "Testing infrastructure for Claude Code agents",
+  "owner": {
+    "name": "Mike Ford",
+    "email": "michael@olastrategy.com"
+  },
+  "plugins": [
+    {
+      "name": "agent-test-harness",
+      "description": "Testing infrastructure for Claude Code agents with multi-turn reflection and LLM-synthesized improvement suggestions",
+      "version": "0.1.0",
+      "author": {
+        "name": "Mike Ford",
+        "email": "michael@olastrategy.com"
+      },
+      "source": ".",
+      "category": "development"
+    }
+  ]
+}
