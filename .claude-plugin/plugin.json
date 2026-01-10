@@ -1,0 +1,14 @@
+{
+  "name": "agent-test-harness",
+  "version": "0.1.0",
+  "description": "Testing infrastructure for Claude Code agents with multi-turn reflection and LLM-synthesized improvement suggestions",
+  "author": {
+    "name": "Mike Ford",
+    "email": "michael@olastrategy.com"
+  },
+  "license": "MIT",
+  "keywords": ["testing", "agents", "automation", "quality-assurance", "reflection", "claude-code"],
+  "commands": ["../commands"],
+  "agents": ["../agents"],
+  "skills": ["../skills"]
+}

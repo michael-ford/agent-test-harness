@@ -1,0 +1,52 @@
+# Example Test Suite
+#
+# This is an example test suite demonstrating the YAML format.
+# Copy and modify this for your own agent testing needs.
+
+name: "example-agent-tests"
+description: "Example test suite demonstrating the agent test harness"
+
+# The directory where the agent will run (must exist)
+agent_dir: "/tmp/test-agent-workspace"
+
+# Maximum turns allowed per test (default: 10)
+max_turns: 5
+
+# Comma-separated list of allowed tools
+allowed_tools: "Bash,Read,Glob,Grep,Write"
+
+# Permission mode: default, acceptEdits, or bypassPermissions
+permission_mode: "acceptEdits"
+
+tests:
+  # Basic file system test
+  - id: "list-directory"
+    prompt: "List all files in the current directory"
+    expected_behavior: "Agent should use ls or Glob to list files"
+    tags:
+      - filesystem
+      - basic
+
+  # Search test
+  - id: "find-python-files"
+    prompt: "Find all Python files in this directory and its subdirectories"
+    expected_behavior: "Agent should use Glob with **/*.py pattern"
+    tags:
+      - search
+      - glob
+
+  # Content analysis test
+  - id: "count-lines"
+    prompt: "Count the total number of lines across all text files"
+    expected_behavior: "Agent should combine Glob and Bash (wc -l)"
+    tags:
+      - analysis
+      - bash
+
+  # Error handling test
+  - id: "handle-missing-file"
+    prompt: "Read the contents of /nonexistent/file.txt and summarize it"
+    expected_behavior: "Agent should gracefully handle the missing file error"
+    tags:
+      - error-handling
+      - edge-case
