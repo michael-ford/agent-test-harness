@@ -56,6 +56,38 @@ def safe_get(data: dict, *keys: str, default: Any = None) -> Any:
     return result
 
 
+def strip_markdown_code_fences(text: str) -> str:
+    """
+    Strip markdown code fences from text.
+
+    Claude often wraps JSON responses in ```json ... ``` code fences.
+    This function extracts the content from within the fences.
+    """
+    if not text:
+        return text
+
+    text = text.strip()
+
+    # Check for code fence pattern: ```json or ``` at start
+    if text.startswith("```"):
+        lines = text.split("\n")
+
+        # Find the opening fence (first line)
+        # It might be ```json, ```JSON, or just ```
+        if lines[0].startswith("```"):
+            # Find the closing fence
+            end_idx = len(lines) - 1
+            while end_idx > 0 and not lines[end_idx].strip() == "```":
+                end_idx -= 1
+
+            # Extract content between fences
+            if end_idx > 0:
+                content = "\n".join(lines[1:end_idx])
+                return content.strip()
+
+    return text
+
+
 # =============================================================================
 # Result Loading
 # =============================================================================
@@ -129,9 +161,12 @@ def parse_reflection(reflection: Optional[dict]) -> dict:
     if not reflection_text:
         return empty_result
 
+    # Strip markdown code fences before parsing JSON
+    clean_text = strip_markdown_code_fences(reflection_text)
+
     # Try to parse as JSON first
     try:
-        data = json.loads(reflection_text)
+        data = json.loads(clean_text)
 
         if isinstance(data, dict):
             return {

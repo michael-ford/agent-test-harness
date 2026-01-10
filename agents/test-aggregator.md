@@ -1,7 +1,7 @@
 ---
 name: test-aggregator
 description: Analyzes test suite results and synthesizes improvement suggestions into actionable themes. Use after running a test suite to identify patterns and prioritize improvements.
-tools: Read, Glob
+tools: Read, Glob, Write
 ---
 
 # Test Aggregator Agent

@@ -38,6 +38,42 @@ Respond in JSON format with keys: process_steps, what_worked, what_didnt_work, i
 
 
 # =============================================================================
+# Utility Functions
+# =============================================================================
+
+def strip_markdown_code_fences(text: str) -> str:
+    """
+    Strip markdown code fences from text.
+
+    Claude often wraps JSON responses in ```json ... ``` code fences.
+    This function extracts the content from within the fences.
+    """
+    if not text:
+        return text
+
+    text = text.strip()
+
+    # Check for code fence pattern: ```json or ``` at start
+    if text.startswith("```"):
+        lines = text.split("\n")
+
+        # Find the opening fence (first line)
+        # It might be ```json, ```JSON, or just ```
+        if lines[0].startswith("```"):
+            # Find the closing fence
+            end_idx = len(lines) - 1
+            while end_idx > 0 and not lines[end_idx].strip() == "```":
+                end_idx -= 1
+
+            # Extract content between fences
+            if end_idx > 0:
+                content = "\n".join(lines[1:end_idx])
+                return content.strip()
+
+    return text
+
+
+# =============================================================================
 # Recursion Protection
 # =============================================================================
 
@@ -247,23 +283,40 @@ def run_claude_command(
             }
 
         # Extract fields from claude output
-        # The claude CLI outputs JSON with various fields
-        response_text = output.get("result", output.get("message", str(output)))
+        # The claude CLI outputs JSON with these fields:
+        # - result: the text response (may be absent for error_max_turns)
+        # - session_id: session identifier
+        # - total_cost_usd: total API cost
+        # - num_turns: number of conversation turns
+        # - subtype: "success" or "error_max_turns"
+        subtype = output.get("subtype", "success")
+        response_text = output.get("result", output.get("message", ""))
         session = output.get("session_id", output.get("sessionId"))
-        cost = output.get("cost_usd", output.get("costUsd", 0.0))
+        # CLI uses total_cost_usd, not cost_usd
+        cost = output.get("total_cost_usd", output.get("cost_usd", output.get("costUsd", 0.0)))
         num_turns = output.get("num_turns", output.get("numTurns", 1))
 
         # Handle case where response_text might be a dict
         if isinstance(response_text, dict):
             response_text = json.dumps(response_text)
 
+        # Handle error_max_turns - this means the task didn't complete within max turns
+        # The CLI still returns exit code 0 but with no result text
+        error_msg = None
+        if subtype == "error_max_turns":
+            error_msg = f"Task did not complete within {num_turns} turns (max_turns limit reached)"
+            if not response_text:
+                response_text = "[Task incomplete - max turns reached]"
+        elif result.returncode != 0:
+            error_msg = result.stderr
+
         return {
-            "success": result.returncode == 0,
+            "success": result.returncode == 0 and subtype == "success",
             "result": response_text,
             "session_id": session,
             "cost_usd": float(cost) if cost else 0.0,
             "num_turns": int(num_turns) if num_turns else 1,
-            "error": result.stderr if result.returncode != 0 else None,
+            "error": error_msg,
         }
 
     except subprocess.TimeoutExpired:
@@ -475,8 +528,10 @@ def aggregate_results(results: list[dict], results_dir: Path) -> dict:
 
         if reflection_text:
             try:
+                # Strip markdown code fences before parsing JSON
+                clean_text = strip_markdown_code_fences(reflection_text)
                 # Try to parse as JSON
-                reflection_data = json.loads(reflection_text)
+                reflection_data = json.loads(clean_text)
 
                 if isinstance(reflection_data, dict):
                     # Extract arrays
