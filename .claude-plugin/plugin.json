@@ -1,6 +1,6 @@
 {
   "name": "agent-test-harness",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Testing infrastructure for Claude Code agents with multi-turn reflection and LLM-synthesized improvement suggestions",
   "author": {
     "name": "Mike Ford",

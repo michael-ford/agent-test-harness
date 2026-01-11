@@ -92,6 +92,7 @@ tests:
 | `max_turns` | No | Maximum turns per test (default: 10) |
 | `allowed_tools` | No | Comma-separated list of allowed tools |
 | `permission_mode` | No | Permission mode: `default`, `acceptEdits`, `bypassPermissions` |
+| `model` | No | Model to use: `sonnet`, `opus`, `haiku`, or full model name (default: user's configured default) |
 
 ### Test Configuration
 
@@ -111,6 +112,7 @@ Each test produces a JSON result file:
   "schema_version": "1.0",
   "test_id": "basic-query",
   "success": true,
+  "model": "sonnet",
   "turn1": {
     "result": "Agent's response text",
     "session_id": "abc123",

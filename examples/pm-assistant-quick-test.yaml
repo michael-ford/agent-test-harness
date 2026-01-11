@@ -1,0 +1,25 @@
+# Quick 2-test validation for pm-assistant after documentation fixes
+name: "pm-assistant-quick-test"
+description: "Quick validation of Airtable snapshot skill after CLAUDE.md improvements"
+agent_dir: "/Users/mikeford/ola-agents/pm-assistant"
+max_turns: 10
+allowed_tools: "Bash,Read,Glob,Grep"
+permission_mode: "acceptEdits"
+model: "sonnet"  # Use sonnet for cheaper test runs (default is user's configured model)
+
+tests:
+  - id: "query-overdue-tasks"
+    prompt: "What tasks are overdue?"
+    expected_behavior: |
+      Should use the <SNAPSHOT_PATH> placeholder pattern from docs.
+      Filter for tasks where due_date < today and status not completed.
+      Return task names, due dates, and owners.
+    tags: ["date-filter", "validation"]
+
+  - id: "project-health-summary"
+    prompt: "Give me a health summary of all projects - how many tasks total, completed, and overdue for each?"
+    expected_behavior: |
+      Should aggregate task counts by project.
+      Calculate completion and overdue metrics.
+      Present in a clear table format.
+    tags: ["aggregation", "cross-project", "validation"]

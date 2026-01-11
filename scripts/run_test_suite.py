@@ -234,6 +234,7 @@ def run_claude_command(
     max_turns: int = 10,
     session_id: Optional[str] = None,
     timeout: Optional[int] = None,
+    model: Optional[str] = None,
 ) -> dict:
     """
     Execute a claude command and return parsed results.
@@ -257,6 +258,9 @@ def run_claude_command(
 
     if permission_mode:
         cmd.extend(["--permission-mode", permission_mode])
+
+    if model:
+        cmd.extend(["--model", model])
 
     cmd.extend(["--max-turns", str(max_turns)])
 
@@ -369,11 +373,15 @@ def run_single_test(
     start_time = time.time()
     timestamp = datetime.now(timezone.utc).isoformat()
 
+    # Get model from suite config (optional)
+    model = suite.get("model")
+
     # Initialize result structure
     result = {
         "schema_version": SCHEMA_VERSION,
         "test_id": test_id,
         "success": False,
+        "model": model,  # Capture model used (None means default)
         "turn1": None,
         "turn2_reflection": None,
         "total_cost_usd": 0.0,
@@ -389,6 +397,7 @@ def run_single_test(
         permission_mode=suite.get("permission_mode"),
         max_turns=suite.get("max_turns", 10),
         timeout=timeout,
+        model=model,
     )
 
     result["turn1"] = {
@@ -415,6 +424,7 @@ def run_single_test(
             session_id=turn1["session_id"],
             max_turns=2,
             timeout=timeout,
+            model=model,
         )
 
         result["turn2_reflection"] = {
